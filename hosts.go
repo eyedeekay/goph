@@ -5,8 +5,10 @@ package goph
 
 import (
 	"errors"
+	"log"
 	"net"
 	"os"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
@@ -31,26 +33,29 @@ func KnownHosts(file string) (ssh.HostKeyCallback, error) {
 // If the host found in known_hosts file and error not nil that means public key mismatch, Maybe
 // MAN IN THE MIDDLE ATTACK! you should not handshake.
 func CheckKnownHost(host string, remote net.Addr, key ssh.PublicKey, knownFile string) (bool, error) {
-
 	var (
-		hostErr error
-		keyErr  *knownhosts.KeyError
+		hostErr  error
+		keyErr   *knownhosts.KeyError
+		callback ssh.HostKeyCallback
 	)
 
 	// Fallback to default known_hosts file
 	if knownFile == "" {
 		knownFile = defaultPath
 	}
-
+	//	hostErr
 	// Get host key callback
-	callback, hostErr := KnownHosts(knownFile)
-
+	if strings.Contains(remote.String(), ".i2p") {
+		log.Println("I2P host detected")
+	} else {
+		callback, hostErr = KnownHosts(knownFile)
+		// check if host already exists.
+		hostErr = callback(host, remote, key)
+	}
+	log.Println("LOG")
 	if hostErr != nil {
 		return false, hostErr
 	}
-
-	// check if host already exists.
-	hostErr = callback(host, remote, key)
 
 	// Known host already exists.
 	if hostErr == nil {

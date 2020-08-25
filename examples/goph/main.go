@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/melbahja/goph"
+	"github.com/eyedeekay/goph"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -75,7 +75,7 @@ func main() {
 	}
 
 	client, err = goph.NewConn(user, addr, auth, func(host string, remote net.Addr, key ssh.PublicKey) error {
-
+		log.Println("connection generated")
 		//
 		// If you want to connect to new hosts.
 		// here your should check new connections public keys
@@ -85,27 +85,26 @@ func main() {
 		// hostFound: is host in known hosts file.
 		// err: error if key not in known hosts file OR host in known hosts file but key changed!
 		hostFound, err := goph.CheckKnownHost(host, remote, key, "")
-
+		log.Println("host:", host, "remote:", remote, "key", key)
 		// Host in known hosts but key mismatch!
 		// Maybe because of MAN IN THE MIDDLE ATTACK!
 		if hostFound && err != nil {
-
 			return err
 		}
-
+		log.Println("LOG")
 		// handshake because public key already exists.
 		if hostFound && err == nil {
 
 			return nil
 		}
-
+		log.Println("LOG")
 		// Ask user to check if he trust the host public key.
 		if askIsHostTrusted(host, key) == false {
-
+			log.Println("LOG")
 			// Make sure to return error on non trusted keys.
 			return errors.New("you typed no, aborted!")
 		}
-
+		log.Println("LOG")
 		// Add the new host to known hosts file.
 		return goph.AddKnownHost(host, remote, key, "")
 	})

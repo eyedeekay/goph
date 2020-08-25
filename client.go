@@ -4,8 +4,8 @@
 package goph
 
 import (
-	"time"
 	"golang.org/x/crypto/ssh"
+	"time"
 )
 
 type Client struct {
@@ -51,7 +51,7 @@ func NewConn(user string, addr string, auth Auth, callback ssh.HostKeyCallback) 
 	err = Conn(c, &ssh.ClientConfig{
 		User:            c.User,
 		Auth:            c.Auth,
-		Timeout:         20 * time.Second,
+		Timeout:         600 * time.Second,
 		HostKeyCallback: callback,
 	})
 

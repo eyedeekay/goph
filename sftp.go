@@ -4,10 +4,10 @@
 package goph
 
 import (
-	"io"
-	"os"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
+	"io"
+	"os"
 )
 
 // Upload local file to remote.
